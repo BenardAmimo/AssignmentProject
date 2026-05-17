@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Courses</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="main-wrapper">
+<nav class="student-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="courses.html">Browse Courses</a>
+    <a href="my-courses.html" class="active">My Courses</a>
+    <a href="profile.html">Profile</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>My Courses</h1>
+
+<div class="filter-bar">
+    <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="searchInput" class="input" type="search" placeholder="Search your courses by title, code, or instructor">
+    </div>
+</div>
+
+<div id="myCoursesList">
+    <p>Loading your courses...</p>
+</div>
+</div>
+
+<script src="/AssignmentProject/js/api.js"></script>
+<script>
+let enrolledCourses = [];
+let currentQuery = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMyCourses();
+    document.getElementById('searchInput').addEventListener('input', filterMyCourses);
+});
+
+async function loadMyCourses() {
+    const container = document.getElementById('myCoursesList');
+    const result = await getData('CourseController.php?action=my-courses');
+
+    if (!result.success) {
+        console.error('Load my courses failed:', result);
+        container.innerHTML = `<p>${escapeHTML(result.message || 'Error loading courses.')}</p>`;
+        return;
+    }
+
+    enrolledCourses = Array.isArray(result.data) ? result.data : [];
+    renderMyCourses(enrolledCourses);
+    attachUnenrollEvents();
+}
+
+function renderMyCourses(courses) {
+    const container = document.getElementById('myCoursesList');
+
+    if (!Array.isArray(courses) || courses.length === 0) {
+        container.innerHTML = '<p>You are not enrolled in any courses yet. <a href="courses.html">Browse courses</a></p>';
+        return;
+    }
+
+    container.innerHTML = courses.map(course => `
+        <div class="course-card">
+            <h3>${highlightMatch(`${course.code} — ${course.title}`, currentQuery)}</h3>
+            <p>${highlightMatch(course.description, currentQuery)}</p>
+            <p><strong>Instructor:</strong> ${highlightMatch(course.instructor, currentQuery)}</p>
+            <p><strong>Credits:</strong> ${course.credits} | <strong>Schedule:</strong> ${course.schedule}</p>
+            <button class="btn enroll-btn" data-id="${course.id}">Unenroll</button>
+        </div>
+    `).join('');
+}
+
+function attachUnenrollEvents() {
+    document.querySelectorAll('#myCoursesList .enroll-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const courseId = btn.dataset.id;
+            if (!confirm('Unenroll from this course?')) {
+                return;
+            }
+            btn.disabled = true;
+            const result = await postData('CourseController.php?action=drop', { course_id: courseId });
+            alert(result.message);
+            if (result.success) {
+                loadMyCourses();
+            } else {
+                btn.disabled = false;
+            }
+        });
+    });
+}
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function highlightMatch(value, query) {
+    const text = escapeHTML(value);
+    if (!query) return text;
+    const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    return text.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
+function filterMyCourses() {
+    currentQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = enrolledCourses.filter(course => {
+        return [course.code, course.title, course.instructor, course.description]
+            .filter(Boolean)
+            .some(field => field.toLowerCase().includes(currentQuery));
+    });
+    renderMyCourses(filtered);
+    attachUnenrollEvents();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

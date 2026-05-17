@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Course</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+<nav class="admin-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="add_course.html" class="active">Add Course</a>
+    <a href="manage-courses.html">Manage Courses</a>
+    <a href="registrations.html">Registrations</a>
+    <a href="users.html">Users</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h2>Add Course</h2>
+
+<form id="courseForm">
+
+    <div class="form-group">
+        <label for="code">Course Code</label>
+        <div class="input-wrap">
+            <input id="code" name="code" placeholder="" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="title">Course Title</label>
+        <div class="input-wrap">
+            <input id="title" name="title" required>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Course description..." required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="instructor">Instructor</label>
+        <div class="input-wrap">
+            <input id="instructor" name="instructor" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <div class="input-wrap">
+            <input id="category" name="category" required>
+        </div>
+    </div>
+     <!-- Credits -->
+<div class="form-group">
+    <label for="credits">Credits</label>
+    <div class="input-wrap">
+        <input 
+            type="number" 
+            id="credits" 
+            name="credits"
+            placeholder="Enter credits"
+            required
+        >
+    </div>
+</div>
+
+<!-- Capacity -->
+<div class="form-group">
+    <label for="capacity">Capacity</label>
+    <div class="input-wrap">
+        <input 
+            type="number" 
+            id="capacity" 
+            name="capacity"
+            min="1"
+            placeholder="Enter class capacity"
+            required
+        >
+    </div>
+</div>
+
+<!-- Schedule -->
+<div class="form-group">
+    <label for="schedule">Schedule</label>
+    <div class="input-wrap">
+        <input 
+            type="datetime-local" 
+            id="schedule" 
+            name="schedule"
+            required
+        >
+    </div>
+</div>
+
+    <button type="submit" class="btn">Save Course</button>
+
+</form>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="admin.js"></script>
+<script>
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

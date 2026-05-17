@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Registrations</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+<nav class="admin-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="add_course.html">Add Course</a>
+    <a href="manage-courses.html">Manage Courses</a>
+    <a href="registrations.html" class="active">Registrations</a>
+    <a href="users.html">Users</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>Registrations</h1>
+
+<p>View course registrations and enrollment details.</p>
+
+<div class="filter-bar">
+    <div class="search-wrap">
+        <input id="searchInput" class="input" type="search" placeholder="Search registrations by course or student">
+    </div>
+</div>
+
+<div id="registrationsList">
+    <p>Loading registrations...</p>
+</div>
+</div>
+
+<script src="/AssignmentProject/js/api.js"></script>
+<script>
+let registrationsData = [];
+let currentQuery = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadRegistrations();
+    document.getElementById('searchInput').addEventListener('input', filterRegistrations);
+});
+
+async function loadRegistrations() {
+    const list = document.getElementById('registrationsList');
+    const result = await getData('RegistrationController.php?action=list');
+
+    if (!result.success) {
+        console.error('Registration load failed:', result);
+        list.innerHTML = `<p>${escapeHTML(result.message || 'Error loading registrations.')}</p>`;
+        return;
+    }
+
+    registrationsData = Array.isArray(result.data) ? result.data : [];
+    renderRegistrations(registrationsData);
+}
+
+function renderRegistrations(registrations) {
+    const list = document.getElementById('registrationsList');
+
+    if (!Array.isArray(registrations) || registrations.length === 0) {
+        list.innerHTML = '<p>No registrations found.</p>';
+        return;
+    }
+
+    list.innerHTML = registrations.map(reg => `
+        <div class="course-item">
+            <h3>${highlightMatch(`${reg.course_code} — ${reg.course_title}`, currentQuery)}</h3>
+            <p><strong>Student:</strong> ${highlightMatch(reg.student_name, currentQuery)} (${highlightMatch(reg.student_email, currentQuery)})</p>
+            <p><strong>Registered:</strong> ${new Date(reg.registered_at).toLocaleString()}</p>
+            <button onclick="deleteRegistration(${reg.id})">Delete</button>
+        </div>
+    `).join('');
+}
+
+async function deleteRegistration(id) {
+    if (!confirm('Delete this registration? This will unenroll the student from the course.')) {
+        return;
+    }
+
+    const result = await postData('RegistrationController.php?action=delete', { id });
+    if (result.success) {
+        loadRegistrations();
+    } else {
+        alert(result.message || 'Unable to delete registration.');
+    }
+}
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function highlightMatch(value, query) {
+    const text = escapeHTML(value);
+    if (!query) return text;
+    const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    return text.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
+function filterRegistrations() {
+    currentQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = registrationsData.filter(reg => {
+        return [reg.course_code, reg.course_title, reg.student_name, reg.student_email]
+            .filter(Boolean)
+            .some(field => field.toLowerCase().includes(currentQuery));
+    });
+    renderRegistrations(filtered);
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

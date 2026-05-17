@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+<nav class="admin-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="add_course.html">Add Course</a>
+    <a href="manage-courses.html">Manage Courses</a>
+    <a href="registrations.html">Registrations</a>
+    <a href="users.html" class="active">Users</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>Users</h1>
+
+<p>Manage student and admin accounts.</p>
+
+<div class="filter-bar">
+    <div class="search-wrap">
+        <input id="searchInput" class="input" type="search" placeholder="Search users by name, email or role">
+    </div>
+</div>
+
+<div id="usersList">
+    <p>Loading users...</p>
+</div>
+</div>
+
+<script src="/AssignmentProject/js/api.js"></script>
+<script>
+let usersData = [];
+let currentQuery = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadUsers();
+    document.getElementById('searchInput').addEventListener('input', filterUsers);
+});
+
+async function loadUsers() {
+    const list = document.getElementById('usersList');
+    const result = await getData('UserController.php?action=list');
+
+    if (!result.success) {
+        console.error('User load failed:', result);
+        list.innerHTML = `<p>${escapeHTML(result.message || 'Error loading users.')}</p>`;
+        return;
+    }
+
+    usersData = Array.isArray(result.data) ? result.data : [];
+    renderUsers(usersData);
+}
+
+function renderUsers(users) {
+    const list = document.getElementById('usersList');
+
+    if (!Array.isArray(users) || users.length === 0) {
+        list.innerHTML = '<p>No users found.</p>';
+        return;
+    }
+
+    list.innerHTML = users.map(user => `
+        <div class="course-item">
+            <h3>${highlightMatch(user.full_name, currentQuery)}</h3>
+            <p><strong>Email:</strong> ${highlightMatch(user.email, currentQuery)}</p>
+            <p><strong>Role:</strong> ${highlightMatch(user.role, currentQuery)}</p>
+            <p><strong>Joined:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+            <button onclick="deleteUser(${user.id})">Delete</button>
+        </div>
+    `).join('');
+}
+
+async function deleteUser(id) {
+    if (!confirm('Delete this user? This action cannot be undone.')) {
+        return;
+    }
+
+    const result = await postData('UserController.php?action=delete', { id });
+    if (result.success) {
+        loadUsers();
+    } else {
+        alert(result.message || 'Unable to delete user.');
+    }
+}
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function highlightMatch(value, query) {
+    const text = escapeHTML(value);
+    if (!query) return text;
+    const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    return text.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
+function filterUsers() {
+    currentQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = usersData.filter(user => {
+        return [user.full_name, user.email, user.role]
+            .filter(Boolean)
+            .some(field => field.toLowerCase().includes(currentQuery));
+    });
+    renderUsers(filtered);
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

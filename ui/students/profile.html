@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Profile</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="main-wrapper">
+<nav class="student-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="courses.html">Browse Courses</a>
+    <a href="my-courses.html">My Courses</a>
+    <a href="profile.html" class="active">Profile</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>Profile</h1>
+
+<div id="profileDetails">
+    <p>Loading profile...</p>
+</div>
+</div>
+
+<script src="/AssignmentProject/js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', loadProfile);
+
+async function loadProfile() {
+    const container = document.getElementById('profileDetails');
+    const result = await getData('UserController.php?action=profile');
+
+    if (!result.success) {
+        container.innerHTML = `<p>${result.message || 'Error loading profile.'}</p>`;
+        return;
+    }
+
+    const user = result.data;
+    container.innerHTML = `
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
+            <p><strong>Full Name:</strong> ${user.full_name}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Role:</strong> ${user.role}</p>
+            <p><strong>Joined:</strong> ${new Date(user.created_at).toLocaleDateString()}</p>
+        </div>
+    `;
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

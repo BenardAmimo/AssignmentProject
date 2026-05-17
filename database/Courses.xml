@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Greenfield Institute Course Registration System
+  XML Course Catalog - Used for data exchange and structured representation
+  of course information across system components.
+-->
+<courseCatalog institution="Greenfield Institute" academicYear="2025-2026" semester="1">
+
+    <metadata>
+        <generatedOn>2025-09-01</generatedOn>
+        <version>1.0</version>
+        <description>Official course offerings for Semester 1, 2025-2026</description>
+    </metadata>
+
+    <departments>
+
+        <department name="Computer Science" code="CS">
+            <course>
+                <code>CS101</code>
+                <title>Introduction to Computer Science</title>
+                <description>Foundations of computing, algorithms, and problem solving using Python.</description>
+                <instructor>Dr. James Kariuki</instructor>
+                <credits>3</credits>
+                <capacity>40</capacity>
+                <schedule>Mon/Wed 08:00-09:30</schedule>
+                <category>Computer Science</category>
+            </course>
+            <course>
+                <code>CS201</code>
+                <title>Data Structures and Algorithms</title>
+                <description>Arrays, linked lists, trees, graphs, sorting and searching algorithms.</description>
+                <instructor>Dr. Esther Wanjiru</instructor>
+                <credits>3</credits>
+                <capacity>35</capacity>
+                <schedule>Tue/Thu 10:00-11:30</schedule>
+                <category>Computer Science</category>
+            </course>
+            <course>
+                <code>CS301</code>
+                <title>Database Management Systems</title>
+                <description>Relational databases, SQL, normalization, and transaction management.</description>
+                <instructor>Prof. Samuel Otieno</instructor>
+                <credits>3</credits>
+                <capacity>30</capacity>
+                <schedule>Mon/Wed/Fri 11:00-12:00</schedule>
+                <category>Computer Science</category>
+            </course>
+            <course>
+                <code>CS401</code>
+                <title>Web Development Fundamentals</title>
+                <description>HTML, CSS, JavaScript, PHP and MySQL for building dynamic web applications.</description>
+                <instructor>Ms. Grace Achieng</instructor>
+                <credits>3</credits>
+                <capacity>30</capacity>
+                <schedule>Tue/Thu 13:00-14:30</schedule>
+                <category>Computer Science</category>
+            </course>
+        </department>
+
+        <department name="Mathematics" code="MATH">
+            <course>
+                <code>MATH101</code>
+                <title>Calculus I</title>
+                <description>Limits, derivatives, integrals and their applications.</description>
+                <instructor>Dr. Peter Muthoni</instructor>
+                <credits>4</credits>
+                <capacity>50</capacity>
+                <schedule>Mon/Wed/Fri 08:00-09:00</schedule>
+                <category>Mathematics</category>
+            </course>
+            <course>
+                <code>MATH201</code>
+                <title>Linear Algebra</title>
+                <description>Vectors, matrices, eigenvalues and linear transformations.</description>
+                <instructor>Dr. Susan Kamau</instructor>
+                <credits>3</credits>
+                <capacity>35</capacity>
+                <schedule>Tue/Thu 08:00-09:30</schedule>
+                <category>Mathematics</category>
+            </course>
+        </department>
+
+        <department name="Business" code="BUS">
+            <course>
+                <code>BUS101</code>
+                <title>Introduction to Business</title>
+                <description>Overview of business functions including management, marketing, and finance.</description>
+                <instructor>Mr. Daniel Mutua</instructor>
+                <credits>3</credits>
+                <capacity>45</capacity>
+                <schedule>Mon/Wed 14:00-15:30</schedule>
+                <category>Business</category>
+            </course>
+            <course>
+                <code>BUS201</code>
+                <title>Entrepreneurship &amp; Innovation</title>
+                <description>Principles of starting and running a business venture in the modern economy.</description>
+                <instructor>Ms. Faith Wambua</instructor>
+                <credits>3</credits>
+                <capacity>40</capacity>
+                <schedule>Fri 09:00-12:00</schedule>
+                <category>Business</category>
+            </course>
+        </department>
+
+        <department name="English" code="ENG">
+            <course>
+                <code>ENG101</code>
+                <title>Technical Writing</title>
+                <description>Clear and effective writing for technical and professional contexts.</description>
+                <instructor>Dr. Lilian Omondi</instructor>
+                <credits>2</credits>
+                <capacity>30</capacity>
+                <schedule>Mon/Thu 15:00-16:00</schedule>
+                <category>English</category>
+            </course>
+        </department>
+
+        <department name="Science" code="SCI">
+            <course>
+                <code>SCI201</code>
+                <title>Research Methods</title>
+                <description>Quantitative and qualitative research methodologies and data analysis.</description>
+                <instructor>Prof. Mark Ndungu</instructor>
+                <credits>3</credits>
+                <capacity>25</capacity>
+                <schedule>Wed/Fri 13:00-14:30</schedule>
+                <category>Science</category>
+            </course>
+        </department>
+
+    </departments>
+
+</courseCatalog>

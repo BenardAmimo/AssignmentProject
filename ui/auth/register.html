@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Greenfield Institute</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="register.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Left: Brand Panel -->
+  <div class="panel-brand">
+    <div class="brand-logo">
+      <div class="brand-logo-icon">G</div>
+      <div class="brand-name">
+        Greenfield Institute
+        <span>Course Registration</span>
+      </div>
+    </div>
+
+    <div class="brand-content">
+      <h2>Start your academic journey</h2>
+      <div class="brand-divider"></div>
+      <p>Join thousands of students managing their courses with ease.</p>
+      <ul class="brand-features">
+        <li>Browse and register for courses instantly</li>
+        <li>Track your enrollment status</li>
+        <li>Access your schedule anytime</li>
+        <li>Secure and reliable platform</li>
+      </ul>
+    </div>
+
+    <p class="brand-footer">© 2025 Greenfield Institute</p>
+  </div>
+
+  <!-- Right: Form Panel -->
+  <div class="panel-form">
+
+    <div class="form-header">
+      <h1>Create Account</h1>
+      <p>Already have an account? <a href="login.html">Sign in here</a></p>
+    </div>
+
+    <!-- Alert box shown/hidden by register.js -->
+    <div class="alert" id="alert"></div>
+
+    <form id="registerForm" novalidate>
+
+      <div class="form-group">
+        <label for="full_name">Full Name</label>
+        <div class="input-wrap">
+          <input type="text" id="full_name" name="full_name"
+            placeholder="Enter name here" required autocomplete="name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <input type="email" id="email" name="email"
+            placeholder="enter email here" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Register as</label>
+        <div class="input-wrap">
+          <select id="role" name="role" required>
+            <option value="student" selected>Student</option>
+            <option value="admin">Admin</option>
+          </select>
+      </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password"
+              placeholder="" required autocomplete="new-password">
+            <button type="button" class="toggle-pw" data-target="password">Show</button>
+          </div>
+          <p class="password-hint">Uppercase letter &amp; number required</p>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm">Confirm Password</label>
+          <div class="input-wrap">
+            <input type="password" id="confirm" name="confirm"
+              placeholder="" required autocomplete="new-password">
+            <button type="button" class="toggle-pw" data-target="confirm">Show</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="spinner" id="spinner"></span>
+        <span id="btnText">Create My Account →</span>
+      </button>
+
+    </form>
+  </div>
+
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="register.js"></script>
+</body>
+</html>

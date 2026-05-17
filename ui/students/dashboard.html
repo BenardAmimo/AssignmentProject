@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+<nav class="student-nav">
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="courses.html">Browse Courses</a>
+    <a href="my-courses.html">My Courses</a>
+    <a href="profile.html">Profile</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>Student Dashboard</h1>
+
+<p>Welcome to your student dashboard. Use the links above to access your courses and profile.</p>
+</div>
+
+<script src="../../js/api.js"></script>
+<script>
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Courses</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+<nav class="admin-nav">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="add_course.html">Add Course</a>
+    <a href="manage-courses.html" class="active">Manage Courses</a>
+    <a href="registrations.html">Registrations</a>
+    <a href="users.html">Users</a>
+    <button id="logoutBtn">Logout</button>
+</nav>
+
+<h1>Manage Courses</h1>
+
+<div id="messageBox" class="message-box" style="display:none; margin-bottom: 1rem; padding: 0.75rem; border-radius: 6px;"></div>
+
+<p>Edit existing courses here.</p>
+
+<div id="editCourseSection" style="display:none; margin-bottom: 1.5rem;">
+    <h2>Edit Course</h2>
+    <form id="editCourseForm">
+        <input type="hidden" id="editCourseId" name="id">
+
+        <div class="form-group">
+            <label for="editCode">Course Code</label>
+            <div class="input-wrap">
+                <input id="editCode" name="code" placeholder="e.g. CS101" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editTitle">Course Title</label>
+            <div class="input-wrap">
+                <input id="editTitle" name="title" placeholder="e.g. Introduction to Computer Science" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editDescription">Description</label>
+            <textarea id="editDescription" name="description" placeholder="Course description..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="editInstructor">Instructor</label>
+            <div class="input-wrap">
+                <input id="editInstructor" name="instructor" placeholder="Instructor name" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editCredits">Credits</label>
+            <div class="input-wrap">
+                <input id="editCredits" name="credits" type="number" min="1" max="6" value="3" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editCapacity">Capacity</label>
+            <div class="input-wrap">
+                <input id="editCapacity" name="capacity" type="number" min="5" value="30" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editSchedule">Schedule</label>
+            <div class="input-wrap">
+                <input id="editSchedule" name="schedule" type="datetime-local" placeholder="Select course date and time" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editCategory">Category</label>
+            <div class="input-wrap">
+                <input id="editCategory" name="category" placeholder="Computer Science" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Save Changes</button>
+        <button type="button" id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+    </form>
+    <hr>
+</div>
+
+<div class="filter-bar">
+    <div class="search-wrap">
+        <input id="searchInput" class="input" type="search" placeholder="Search courses by title, code or instructor">
+    </div>
+</div>
+
+<div id="coursesList">
+    <p>Loading courses...</p>
+</div>
+</div>
+
+<script src="/AssignmentProject/js/api.js"></script>
+<script>
+let coursesData = [];
+let currentQuery = '';
+
+async function ensureAdminSession() {
+    const result = await getData('UserController.php?action=profile');
+    if (!result.success || result.data?.role !== 'admin') {
+        alert('Admin access required. Redirecting to login.');
+        window.location.href = '../auth/login.html';
+        return false;
+    }
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!(await ensureAdminSession())) {
+        return;
+    }
+
+    loadCourses();
+    document.getElementById('searchInput').addEventListener('input', filterCourses);
+    document.getElementById('editCourseForm').addEventListener('submit', updateCourse);
+    document.getElementById('cancelEditBtn').addEventListener('click', clearEditForm);
+});
+
+async function loadCourses() {
+    const result = await getData('CourseController.php?action=list');
+    const container = document.getElementById('coursesList');
+    if (result.success) {
+        coursesData = Array.isArray(result.data) ? result.data : [];
+        renderCourses(coursesData);
+    } else {
+        console.error('Course load failed:', result);
+        const message = result.message || 'Error loading courses.';
+        container.innerHTML = `<p>${escapeHTML(message)}</p>`;
+    }
+}
+
+function renderCourses(courses) {
+    const container = document.getElementById('coursesList');
+    if (!Array.isArray(courses) || courses.length === 0) {
+        container.innerHTML = '<p>No courses found.</p>';
+        return;
+    }
+
+    container.innerHTML = courses.map(course => `
+        <div class="course-item">
+            <h3>${highlightMatch(`${course.code} — ${course.title}`, currentQuery)}</h3>
+            <p>${highlightMatch(course.description, currentQuery)}</p>
+            <p><strong>Instructor:</strong> ${highlightMatch(course.instructor, currentQuery)} | 
+               <strong>Category:</strong> ${highlightMatch(course.category, currentQuery)}</p>
+            <p><strong>Credits:</strong> ${course.credits} | 
+               <strong>Capacity:</strong> ${course.capacity} | 
+               <strong>Schedule:</strong> ${highlightMatch(course.schedule, currentQuery)}</p>
+            <div class="course-actions" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem;">
+                <button class="btn" onclick="openEditForm(${course.id})">Update</button>
+                <button class="btn btn-danger" onclick="deleteCourse(${course.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openEditForm(courseId) {
+    const course = coursesData.find(c => c.id === courseId);
+    if (!course) {
+        alert('Course not found.');
+        return;
+    }
+
+    document.getElementById('editCourseSection').style.display = 'block';
+    document.getElementById('editCourseId').value = course.id;
+    document.getElementById('editCode').value = course.code || '';
+    document.getElementById('editTitle').value = course.title || '';
+    document.getElementById('editDescription').value = course.description || '';
+    document.getElementById('editInstructor').value = course.instructor || '';
+    document.getElementById('editCredits').value = course.credits || 3;
+    document.getElementById('editCapacity').value = course.capacity || 30;
+    document.getElementById('editSchedule').value = parseScheduleForDatetimeLocal(course.schedule);
+    document.getElementById('editCategory').value = course.category || '';
+}
+
+function parseScheduleForDatetimeLocal(schedule) {
+    if (!schedule) {
+        return '';
+    }
+
+    const date = new Date(schedule);
+    if (isNaN(date.getTime())) {
+        return '';
+    }
+
+    const tzOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - tzOffset);
+    return localDate.toISOString().slice(0, 16);
+}
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function highlightMatch(value, query) {
+    const text = escapeHTML(value);
+    if (!query) return text;
+    const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    return text.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
+function filterCourses() {
+    currentQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = coursesData.filter(course => {
+        return [course.title, course.code, course.instructor, course.description, course.category, course.schedule]
+            .filter(Boolean)
+            .some(field => field.toLowerCase().includes(currentQuery));
+    });
+    renderCourses(filtered);
+}
+
+async function updateCourse(event) {
+    event.preventDefault();
+
+    const data = {
+        id: Number(document.getElementById('editCourseId').value),
+        code: document.getElementById('editCode').value,
+        title: document.getElementById('editTitle').value,
+        description: document.getElementById('editDescription').value,
+        instructor: document.getElementById('editInstructor').value,
+        credits: Number(document.getElementById('editCredits').value),
+        capacity: Number(document.getElementById('editCapacity').value),
+        schedule: document.getElementById('editSchedule').value,
+        category: document.getElementById('editCategory').value
+    };
+
+    const result = await postData('CourseController.php?action=update', data);
+    if (result.success) {
+        alert('Course updated successfully.');
+        clearEditForm();
+        loadCourses();
+    } else {
+        alert(result.message || 'Unable to update course.');
+    }
+}
+
+function clearEditForm() {
+    document.getElementById('editCourseSection').style.display = 'none';
+    document.getElementById('editCourseForm').reset();
+}
+
+function showMessage(type, text) {
+    const box = document.getElementById('messageBox');
+    if (!box) return;
+
+    box.style.display = 'block';
+    box.textContent = text;
+    box.style.backgroundColor = type === 'success' ? '#e6ffed' : '#ffe6e6';
+    box.style.color = type === 'success' ? '#136f2b' : '#8a1212';
+    box.style.border = type === 'success' ? '1px solid #a6e6b8' : '1px solid #f5a9a9';
+}
+
+function clearMessage() {
+    const box = document.getElementById('messageBox');
+    if (!box) return;
+    box.style.display = 'none';
+    box.textContent = '';
+}
+
+async function deleteCourse(id) {
+    if (!confirm('Delete this course? This cannot be undone.')) {
+        return;
+    }
+
+    const result = await postData('CourseController.php?action=delete', { id });
+    if (result.success) {
+        showMessage('success', 'Course deleted successfully.');
+        loadCourses();
+    } else {
+        showMessage('error', result.message || 'Unable to delete course.');
+    }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const result = await postData('logout.php', {});
+    if (result.success) {
+        window.location.href = '../auth/login.html';
+    }
+});
+</script>
+
+</body>
+</html>

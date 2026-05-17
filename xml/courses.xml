@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<courses>
+  <course>
+    <id>1</id>
+    <code>CS101</code>
+    <title>Introduction to Computer Science</title>
+  </course>
+  <course>
+    <id>2</id>
+    <code>CS201</code>
+    <title>Data Structures and Algorithms</title>
+  </course>
+  <course>
+    <id>3</id>
+    <code>CS301</code>
+    <title>Database Management Systems</title>
+  </course>
+  <course>
+    <id>4</id>
+    <code>CS401</code>
+    <title>Web Development Fundamentals</title>
+  </course>
+  <course>
+    <id>5</id>
+    <code>MATH101</code>
+    <title>Calculus I</title>
+  </course>
+  <course>
+    <id>6</id>
+    <code>MATH201</code>
+    <title>Linear Algebra</title>
+  </course>
+  <course>
+    <id>7</id>
+    <code>BUS101</code>
+    <title>Introduction to Business</title>
+  </course>
+  <course>
+    <id>8</id>
+    <code>BUS201</code>
+    <title>Entrepreneurship &amp; Innovation</title>
+  </course>
+  <course>
+    <id>9</id>
+    <code>ENG101</code>
+    <title>Technical Writing</title>
+  </course>
+  <course>
+    <id>10</id>
+    <code>SCI201</code>
+    <title>Research Methods</title>
+  </course>
+  <course>
+    <id>57</id>
+    <code>ICS342</code>
+    <title>Internet Applications JAVASCRIPT</title>
+  </course>
+</courses>

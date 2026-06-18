@@ -33,7 +33,7 @@
   <course>
     <id>7</id>
     <code>BUS101</code>
-    <title>Introduction to Business</title>
+    <title>Introduction to Business Studies</title>
   </course>
   <course>
     <id>8</id>
@@ -51,8 +51,8 @@
     <title>Research Methods</title>
   </course>
   <course>
-    <id>57</id>
-    <code>ICS342</code>
-    <title>Internet Applications JAVASCRIPT</title>
+    <id>82</id>
+    <code>NUR231</code>
+    <title>Clinical Phamacology</title>
   </course>
 </courses>
